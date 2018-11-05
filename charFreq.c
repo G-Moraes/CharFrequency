@@ -70,7 +70,7 @@ void imprimeConteudo(Conteudo* c){
 	for(i = 0; i < c->tamAlfabeto; i++){
 		
 		printf("Linha %d: %s", i + 1, c->matAlfabeto[i]);
-		printf("Quantidade de elementos da linha %d: %d\n\n", i +1, c->vetorTamColunas[i] - 1);
+		printf("tamanho da String %d que substitui %c: %d\n\n", i +1, c->matAlfabeto[i][0], c->vetorTamColunas[i] - 3);
 	}
 }
 
@@ -174,7 +174,7 @@ char* codificar(Conteudo* c){
 
 	printf("String a ser codificada: '%s'\n", c->string);
 
-	printf("String codificada: ");
+	printf("String codificada: '");
 
 	for(i = 0; i < c->tamString; i++){
 
@@ -189,7 +189,7 @@ char* codificar(Conteudo* c){
 				//printf("entrei aq 3\n");
 				
 				for(k = 2; k < c->vetorTamColunas[j] - 1; k++){
-
+					
 					stringRetorno[indexString] = auxString[j][k];
 					indexString++;
 					printf("%c", auxString[j][k]);
@@ -198,7 +198,7 @@ char* codificar(Conteudo* c){
 		}
 	}
 
-	printf("\n");
+	printf("'\n");	
 
 	return stringRetorno;
 }
@@ -206,7 +206,7 @@ char* codificar(Conteudo* c){
 void decodificar(FILE* arquivo, char* string){
 
 	int i, j, k, contador = 0;
-	int x = lenght(string);
+	int x = strlen(string);
 	char* stringDecodificada; 
 	
 	Conteudo* abacchio = getContent(arquivo);
@@ -217,7 +217,23 @@ void decodificar(FILE* arquivo, char* string){
 
 	printf("String decodificada: '");
 
-	
+		int index = i;
+		int index2 = 2;
+		int valor = 0;
+
+	for(i = 0; i < abacchio->tamString; i++){
+
+		for(j = 0; j < abacchio->tamAlfabeto; j++){
+
+			if(abacchio->matAlfabeto[j][2] == string[i]){
+
+				while(abacchio->matAlfabeto[j][2] == string[i]){
+
+				}
+			}
+		}		
+	}
+
 	printf("'\n");
 }
 
