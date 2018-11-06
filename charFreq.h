@@ -15,14 +15,12 @@ typedef struct conteudo{
 
 FILE* fileCreate();
 FILE* fileOpen();
-//Conteudo* geraValores(FILE* texto);
-int lenght(char* string);
 void imprimeConteudo(Conteudo* c);
 Conteudo* getContent(FILE* arquivo);
 char* codificar(Conteudo* c);
-void decodificar(FILE* arquivo, char* string);
+char* decodificar(FILE* arquivo, char* string);
 FILE* criaDefault();
 void imprimeArquivo(FILE* arquivo);
-int* crazyDiamond(FILE* arquivo);
+int* setarTamanhoVetor(FILE* arquivo);
 
 #endif

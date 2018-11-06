@@ -3,19 +3,19 @@
 #include <string.h>
 #include "charFreq.h"
 
-
-
 int main(){
 
 	FILE* arquivo = criaDefault();
 
-	Conteudo* fugo = getContent(arquivo);
+	//Conteudo* fugo = getContent(arquivo);
 
-	imprimeConteudo(fugo);
+	imprimeArquivo(arquivo);
 
-	char* vetor = codificar(fugo);
+	//imprimeConteudo(fugo);
 
-	decodificar(arquivo, vetor);
+	//char* vetor = codificar(fugo);
+
+	//decodificar(arquivo, vetor);
 
 	return 0;
 }
@@ -25,7 +25,7 @@ FILE* fileCreate(){
 
 	FILE* arquivo;
 
-	if ((arquivo = fopen("arquivo.txt", "w+b")) == NULL){
+	if ((arquivo = fopen("arquivo.txt", "w")) == NULL){
 		
 		printf("Erro ao abrir arquivo!\n\n");
 		exit(1);
@@ -38,25 +38,13 @@ FILE* fileOpen(){
 
 	FILE* arquivo;
 
-	if ((arquivo = fopen("arquivo.txt", "r+b")) == NULL){
+	if ((arquivo = fopen("arquivo.txt", "r")) == NULL){
 
 		printf("Erro ao abrir arquivo! É provável que o arquivo 'arquivo.txt' não exista.\n\n");
 		exit(1);
 	}
 
 	return arquivo;
-}
-
-int lenght(char* string){
-	
-	int i, tamanho = 0;
-
-	for(i = 0; string[i] != '\0'; i++){
-
-		tamanho++;
-	}
-
-	return tamanho;
 }
 
 void imprimeConteudo(Conteudo* c){
@@ -87,32 +75,40 @@ Conteudo* getContent(FILE* arquivo){
 	int* vetor; 
 
 	//leio e armazeno o primeiro elemento (tamanho da string) e preencho na struct de retorno
-	fread(&auxInt1, sizeof(int), 1, arquivo);
+	//fread(&auxInt1, sizeof(int), 1, arquivo);
+	fscanf(arquivo, "%d", &auxInt1);
 	giorno->tamString = auxInt1;
-	
+	printf("tamando da string: %d\n");
+
 	//seto o tamanho do texto e atualizo o tamanho do atributo da struct de retorno
 	auxString = (char*) malloc(sizeof(char) * auxInt1);
 	giorno->string = (char*) malloc(sizeof(char) * auxInt1);
 
 	//quebra de linha
-	fread(&neutro, sizeof(char), 1, arquivo);
+	fgetc(arquivo);
 
 	//leio o texto
-	fread(auxString, sizeof(char*) * auxInt1, 1, arquivo);
+	//fread(auxString, sizeof(char*) * auxInt1, 1, arquivo);
+	fscanf(arquivo, "%s", auxString);
+	printf("string: %s\n", auxString);
 
 	//copio da variável para a struct de retorno
 	strcpy(giorno->string, auxString);
  
 	//quebra de linha
-	fread(&neutro, sizeof(char), 1, arquivo);
+	//fread(&neutro, sizeof(char), 1, arquivo);
+	fgetc(arquivo);
 
 	//leio e armazeno o terceiro elemento (quantidade de elementos de códigos) e preencho na struct de retorno
-	fread(&auxInt2, sizeof(int), 1, arquivo);
+	//fread(&auxInt2, sizeof(int), 1, arquivo);
+	fscanf(arquivo, "%d", &auxInt2);
+	printf("tamanho da matriz: %d\n", auxInt2);
 	giorno->tamAlfabeto = auxInt2;
 
 	vetor = (int*) malloc(sizeof(int) * auxInt2);
 
-	vetor = crazyDiamond(arquivo);
+	vetor = setarTamanhoVetor(arquivo);
+
 	giorno->vetorTamColunas = (int*) malloc(sizeof(int) * auxInt2);
 
 	for(i = 0; i < auxInt2; i++){
@@ -120,7 +116,7 @@ Conteudo* getContent(FILE* arquivo){
 		giorno->vetorTamColunas[i] = vetor[i];
 	}
 
-	fseek(arquivo, (sizeof(int) + sizeof(char) + (sizeof(char* ) * auxInt1) + sizeof(char) + sizeof(int)), SEEK_SET);
+	fseek(arquivo, (sizeof(char) + sizeof(char) + (sizeof(char* ) * auxInt1) + sizeof(char) + sizeof(char)), SEEK_SET);
 
 	//seto a matriz de retorno pra ter o tamanho certo
 	giorno->matAlfabeto = (char**) malloc(sizeof(char*) * auxInt2);
@@ -133,15 +129,22 @@ Conteudo* getContent(FILE* arquivo){
 	}
 
 	//quebra de linha
-	fread(&neutro, sizeof(char), 1, arquivo);
+	//fread(&neutro, sizeof(char), 1, arquivo);
+	fgetc(arquivo);
+
+	/*for(i = 0; i < auxInt2; i++){
+		for(j = 0; j < vetor[i]; j++){
+			//fread(&giorno->matAlfabeto[i][j], sizeof(char), 1, arquivo);
+			//printf("%c", giorno->matAlfabeto[i][j]);
+			fscanf(arquivo, "%c", &giorno->matAlfabeto[i][j]);
+		}
+	}*/
 
 	for(i = 0; i < auxInt2; i++){
 
-		for(j = 0; j < vetor[i]; j++){
-
-			fread(&giorno->matAlfabeto[i][j], sizeof(char), 1, arquivo);
-			//printf("%c", giorno->matAlfabeto[i][j]);
-		}
+		fscanf(arquivo, "%s", giorno->matAlfabeto[i]);
+		printf("string da linha %d é: %s\n", i + 1, giorno->matAlfabeto[i]);
+		fgetc(arquivo);
 	}
 
 	rewind(arquivo);
@@ -203,7 +206,7 @@ char* codificar(Conteudo* c){
 	return stringRetorno;
 }
 
-void decodificar(FILE* arquivo, char* string){
+char* decodificar(FILE* arquivo, char* string){
 
 	int i, j, k, contador = 0;
 	int x = strlen(string);
@@ -213,35 +216,48 @@ void decodificar(FILE* arquivo, char* string){
 
 	stringDecodificada = (char*) malloc(sizeof(char) * x);
 
-	//printf("%d\n", abacchio->tamAlfabeto);
-
 	printf("String decodificada: '");
 
-		int index = i;
-		int index2 = 2;
-		int valor = 0;
+	int controle = 0;
 
-	for(i = 0; i < abacchio->tamString; i++){
+	for(i = 0; i < x; i++){
 
 		for(j = 0; j < abacchio->tamAlfabeto; j++){
 
-			if(abacchio->matAlfabeto[j][2] == string[i]){
+			for(k = 0; k < abacchio->vetorTamColunas[j] - 3; k++){
+				
+				if(abacchio->matAlfabeto[j][k + 2] != string[i + k]){
 
-				while(abacchio->matAlfabeto[j][2] == string[i]){
-
+					break;
 				}
+				
+				else if(k  == abacchio->vetorTamColunas[j] - 4){
+					
+					stringDecodificada[i] = abacchio->matAlfabeto[j][0];
+					printf("%c", abacchio->matAlfabeto[j][0]);
+					i = i + k;
+					controle = 1;
+				} 
 			}
-		}		
+
+			if(controle == 1){
+			
+				controle = 0;
+				break;
+			}
+		}	
 	}
 
 	printf("'\n");
+
+	return stringDecodificada;
 }
 
 FILE* criaDefault(){
 
 	int n = 5, i, j;
 	char test[] = "DCCACADEACCCCCBCEBBBD";
-	int x = lenght(test);
+	int x =	strlen(test);
 	char linha = '\n';
 	char auxChar;
 	char* auxString = (char*) malloc(sizeof(char) * x);
@@ -254,40 +270,62 @@ FILE* criaDefault(){
 		matriz[i] = (char*) malloc(sizeof(char) * x);
 	}
 
-	matriz[0] = "A00";
-	matriz[1] = "B0100";
-	matriz[2] = "C0101";
-	matriz[3] = "D011";
-	matriz[4] = "E1";
+	matriz[0] = "A 00";
+	matriz[1] = "B 0100";
+	matriz[2] = "C 0101";
+	matriz[3] = "D 011";
+	matriz[4] = "E 1";
 
 	FILE* arquivo = fileCreate();
 
-	fwrite(&x, sizeof(int), 1, arquivo);
-	fwrite(&linha, sizeof(char), 1, arquivo);
-	fwrite(test, sizeof(char*) * x, 1, arquivo);
-	fwrite(&linha, sizeof(char), 1, arquivo);
-	fwrite(&n, sizeof(int), 1, arquivo);
-	fwrite(&linha, sizeof(char), 1, arquivo);
+	fprintf(arquivo, "%d\n%s\n%d\n", x, test, n);
+
+	//fwrite(&x, sizeof(int), 1, arquivo);
+	
+	//fprintf(arquivo, "%d\n", x);
+	
+	//fwrite(&linha, sizeof(char), 1, arquivo);
+	//fprintf(arquivo, "%c", linha);
+	//fwrite(test, sizeof(char*) * x, 1, arquivo);
+	
+	//fprintf(arquivo, "%s\n", test);
+	
+	//fwrite(&linha, sizeof(char), 1, arquivo);
+	//fprintf(arquivo, "%c", linha);
+	//fwrite(&n, sizeof(int), 1, arquivo);
+	
+	//fprintf(arquivo, "%d\n", n);
+	
+	//fwrite(&linha, sizeof(char), 1, arquivo);
+	//fprintf(arquivo, "%c", linha);
 
 	for(i = 0; i < n; i++){
 
-		auxChar = matriz[i][0];
-		fwrite(&auxChar, sizeof(char), 1, arquivo);
-		fwrite(&espaco, sizeof(char), 1, arquivo);
+		fprintf(arquivo, "%s\n", matriz[i]);
+	}
 
+	/*for(i = 0; i < n; i++){
+
+		auxChar = matriz[i][0];
+		//fwrite(&auxChar, sizeof(char), 1, arquivo);
+		fprintf(arquivo, "%c ", auxChar);
+		//fwrite(&espaco, sizeof(char), 1, arquivo);
+		//fprintf(arquivo, "%c", espaco);
 		//printf("linha %d, coluna 0: %c\n", i, auxChar);
 
 		for(j = 1; matriz[i][j] != '\0'; j++){
 
 			auxChar = matriz[i][j];
 			//printf("linha %d, coluna %d: %c\n", i, j, auxChar);
-			fwrite(&auxChar, sizeof(char), 1, arquivo);
+			//fwrite(&auxChar, sizeof(char), 1, arquivo);
+			fprintf(arquivo, "%c", auxChar);
 		}
 		
 		//printf("\n");
-		auxString[j] = '\0';
-		fwrite(&linha, sizeof(char), 1, arquivo);
-	}
+		//auxString[j] = '\0';
+		//fwrite(&linha, sizeof(char), 1, arquivo);
+		fprintf(arquivo, "%c", linha);
+	}*/
 
 	rewind(arquivo);
 	return arquivo;
@@ -297,45 +335,54 @@ void imprimeArquivo(FILE* arquivo){
 
 	char auxChar;
 	char* auxString;
-	int auxInt;
+	int auxInt1, auxInt2;
 	int* tamanhoLinhas;
 
 	rewind(arquivo);
 
-	fread(&auxInt, sizeof(int), 1, arquivo); //tamanho do texto
-	printf("%d", auxInt);
-	fread(&auxChar, sizeof(char), 1, arquivo); //quebra de linha
-	printf("%c", auxChar);
+	//fread(&auxInt, sizeof(int), 1, arquivo); //tamanho do texto
+	
+	fscanf(arquivo, "%d", &auxInt1);
+	printf("%d\n", auxInt1);
+	fgetc(arquivo);
+	
+	//fread(&auxChar, sizeof(char), 1, arquivo); //quebra de linha
+	//printf("%c", auxChar);
 
-	auxString = (char*) malloc(sizeof(char) * auxInt);
+	auxString = (char*) malloc(sizeof(char) * auxInt1);
 
-	fread(auxString, sizeof(char*) * auxInt, 1, arquivo); //texto do arquivo
-	printf("%s", auxString);
-	fread(&auxChar, sizeof(char), 1, arquivo); //quebra de linha
-	printf("%c", auxChar);
-	fread(&auxInt, sizeof(int), 1, arquivo); //tamanho da matriz de elementos
-	printf("%d", auxInt);
+	//fread(auxString, sizeof(char*) * auxInt, 1, arquivo); //texto do arquivo
+	fscanf(arquivo, "%s", auxString);
+	printf("%s\n", auxString);
+	
+	//fread(&auxChar, sizeof(char), 1, arquivo); //quebra de linha
+	//printf("%c", auxChar);
+	fgetc(arquivo);
+	
+	//fread(&auxInt, sizeof(int), 1, arquivo); //tamanho da matriz de elementos
+	fscanf(arquivo, "%d", &auxInt2);
+	printf("%d\n", auxInt2);
 
-	tamanhoLinhas = (int*) malloc(sizeof(int) * auxInt);
+	tamanhoLinhas = (int*) malloc(sizeof(int) * auxInt2);
 
-	fread(&auxChar, sizeof(char), 1, arquivo); //quebra de linha
-	printf("%c", auxChar);
+	//fread(&auxChar, sizeof(char), 1, arquivo); //quebra de linha
+	fgetc(arquivo);
+	//printf("%c\n", auxChar);
 	
 	int valor = 0;
 	int indice = 0;
 
-	while(!feof(arquivo)){
+	while(fscanf(arquivo, "%s", auxString) != EOF){
 		
-		
-		fread(&auxChar, sizeof(char), 1, arquivo); //texto da matriz
-		printf("%c", auxChar);
+		//fread(&auxChar, sizeof(char), 1, arquivo); //texto da matriz
+		printf("%s", auxString);
 	}
 
-	//printf("Fim da impressão.\n\n");
+	printf("Fim da impressão.\n");
 	rewind(arquivo);
 }
 
-int* crazyDiamond(FILE* arquivo){
+int* setarTamanhoVetor(FILE* arquivo){
 
 	char auxChar;
 	char* auxString;
@@ -344,33 +391,40 @@ int* crazyDiamond(FILE* arquivo){
 
 	rewind(arquivo);
 
-	fread(&auxInt, sizeof(int), 1, arquivo); //tamanho do texto
-	fread(&auxChar, sizeof(char), 1, arquivo); //quebra de linha
+	//fread(&auxInt, sizeof(int), 1, arquivo); //tamanho do texto
+	fscanf(arquivo, "%d", &auxInt);
+	//fread(&auxChar, sizeof(char), 1, arquivo); //quebra de linha
+	fscanf(arquivo, "%c", &auxChar);
 
 	auxString = (char*) malloc(sizeof(char) * auxInt);
 
-	fread(auxString, sizeof(char*) * auxInt, 1, arquivo); //texto do arquivo
-	fread(&auxChar, sizeof(char), 1, arquivo); //quebra de linha
-	fread(&auxInt, sizeof(int), 1, arquivo); //tamanho da matriz de elementos
+	//fread(auxString, sizeof(char*) * auxInt, 1, arquivo); //texto do arquivo
+	fscanf(arquivo, "%s", auxString);
+
+	//fread(&auxChar, sizeof(char), 1, arquivo); //quebra de linha
+	fscanf(arquivo, "%c", &auxChar);
+	//fread(&auxInt, sizeof(int), 1, arquivo); //tamanho da matriz de elementos
+	fscanf(arquivo, "%d", &auxInt);
 
 	tamanhoLinhas = (int*) malloc(sizeof(int) * auxInt);
 
-	fread(&auxChar, sizeof(char), 1, arquivo); //quebra de linha
-	
+	//fread(&auxChar, sizeof(char), 1, arquivo); //quebra de linha
+	fscanf(arquivo, "%c", &auxChar);
+
 	int valor = 0;
 	int indice = 0;
 
-	while(!feof(arquivo)){
-		
-		fread(&auxChar, sizeof(char), 1, arquivo); //texto da matriz
-		valor++;
-		
-		if(auxChar == '\n'){
+	printf("%d\n", auxInt);
 
-			tamanhoLinhas[indice] = valor;
-			valor = 0;
-			indice++;
-		}
+	while(indice < auxInt){
+
+		//fread(&auxChar, sizeof(char), 1, arquivo); //texto da matriz
+		fscanf(arquivo, "%s", auxString);
+		//fgetc(arquivo);
+		valor = strlen(auxString);
+		printf("string %d tem tamanho %d\n", indice + 1, valor);
+		tamanhoLinhas[indice] = valor;
+		indice++;
 	}
 
 	rewind(arquivo);
