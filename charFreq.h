@@ -14,11 +14,11 @@ typedef struct conteudo{
 } Conteudo;
 
 FILE* fileCreate();
-FILE* fileOpen();
+void fileOpen();
 void imprimeConteudo(Conteudo* c);
 Conteudo* getContent(FILE* arquivo);
 char* codificar(Conteudo* c);
-char* decodificar(FILE* arquivo, char* string);
+char* decodificar(Conteudo* c, char* string);
 FILE* criaDefault();
 void imprimeArquivo(FILE* arquivo);
 int* setarTamanhoVetor(FILE* arquivo);
