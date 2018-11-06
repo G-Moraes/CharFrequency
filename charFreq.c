@@ -7,9 +7,9 @@ int main(){
 
 	FILE* arquivo = criaDefault();
 
-	//Conteudo* fugo = getContent(arquivo);
+	Conteudo* fugo = getContent(arquivo);
 
-	imprimeArquivo(arquivo);
+	//imprimeArquivo(arquivo);
 
 	//imprimeConteudo(fugo);
 
@@ -25,7 +25,7 @@ FILE* fileCreate(){
 
 	FILE* arquivo;
 
-	if ((arquivo = fopen("arquivo.txt", "w")) == NULL){
+	if ((arquivo = fopen("arquivo.txt", "w+")) == NULL){
 		
 		printf("Erro ao abrir arquivo!\n\n");
 		exit(1);
@@ -38,7 +38,7 @@ FILE* fileOpen(){
 
 	FILE* arquivo;
 
-	if ((arquivo = fopen("arquivo.txt", "r")) == NULL){
+	if ((arquivo = fopen("arquivo.txt", "r+")) == NULL){
 
 		printf("Erro ao abrir arquivo! É provável que o arquivo 'arquivo.txt' não exista.\n\n");
 		exit(1);
@@ -71,6 +71,8 @@ Conteudo* getContent(FILE* arquivo){
 	char auxChar;
 	char* auxString;
 	char** auxMatrix;
+
+	rewind(arquivo);
 
 	int* vetor; 
 
@@ -354,14 +356,14 @@ void imprimeArquivo(FILE* arquivo){
 	//fread(auxString, sizeof(char*) * auxInt, 1, arquivo); //texto do arquivo
 	fscanf(arquivo, "%s", auxString);
 	printf("%s\n", auxString);
-	
+
 	//fread(&auxChar, sizeof(char), 1, arquivo); //quebra de linha
 	//printf("%c", auxChar);
 	fgetc(arquivo);
 	
 	//fread(&auxInt, sizeof(int), 1, arquivo); //tamanho da matriz de elementos
 	fscanf(arquivo, "%d", &auxInt2);
-	printf("%d\n", auxInt2);
+	//printf("%d\n", auxInt2);
 
 	tamanhoLinhas = (int*) malloc(sizeof(int) * auxInt2);
 
@@ -372,10 +374,13 @@ void imprimeArquivo(FILE* arquivo){
 	int valor = 0;
 	int indice = 0;
 
-	while(fscanf(arquivo, "%s", auxString) != EOF){
+	while(fscanf(arquivo, "%c", &auxChar) != EOF){
 		
 		//fread(&auxChar, sizeof(char), 1, arquivo); //texto da matriz
-		printf("%s", auxString);
+		fscanf(arquivo, "%s", auxString);
+		printf("%c ", auxChar);
+		printf("%s\n", auxString);
+		fgetc(arquivo);
 	}
 
 	printf("Fim da impressão.\n");
