@@ -5,7 +5,7 @@
 
 int main(){
 
-	fileOpen();
+	function();
 
 	return 0;
 }
@@ -24,7 +24,7 @@ FILE* fileCreate(){
 	return arquivo;
 }
 
-void fileOpen(){
+void function(){
 
 	FILE* arquivo = fopen("arquivo.txt", "r+");
 
@@ -32,9 +32,14 @@ void fileOpen(){
 
 	mista = getContent(arquivo);
 
+	//imprimeConteudo(mista);
+	imprimeArquivo(arquivo);
+
 	char* vetor = codificar(mista);
 
 	decodificar(mista, vetor);
+
+	//createHeap(mista->string);
 }
 
 void imprimeConteudo(Conteudo* c){
@@ -49,7 +54,7 @@ void imprimeConteudo(Conteudo* c){
 	for(i = 0; i < c->tamAlfabeto; i++){
 		
 		printf("Linha %d: %s\n", i + 1, c->matAlfabeto[i]);
-		printf("Tamanho da String %d que substitui %c: %d\n\n", i + 1, c->matAlfabeto[i][0], c->vetorTamColunas[i]);
+		printf("Tamanho da String %d que substitui %c: %d\n\n", i + 1, c->matAlfabeto[i][0], c->vetorTamColunas[i] - 2);
 	}
 }
 
@@ -481,3 +486,34 @@ int* setarTamanhoVetor(FILE* arquivo){
 
 	return tamanhoLinhas;
 }
+
+/*int* createHeap(char* string){
+	
+	int tamString = strlen(string), i, j;
+	int* retorno;
+	char* auxString = (char*) malloc(sizeof(char) * tamString);
+
+	for(i = 0; i < tamString; i++){
+
+		while(j != tamString){
+
+			if(i == 0  && j == 0){
+
+				auxString[i] = string[i];
+			}
+
+			else if(auxString[j] == string[i]){
+
+				i++;
+			}
+
+			else{
+
+				auxString[j] = string[i];
+				j = 0;
+			}
+		}
+	}
+
+	printf("%s\n", string);
+}*/

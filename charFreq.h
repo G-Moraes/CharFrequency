@@ -14,7 +14,7 @@ typedef struct conteudo{
 } Conteudo;
 
 FILE* fileCreate();
-void fileOpen();
+void function();
 void imprimeConteudo(Conteudo* c);
 Conteudo* getContent(FILE* arquivo);
 char* codificar(Conteudo* c);
@@ -22,5 +22,5 @@ char* decodificar(Conteudo* c, char* string);
 FILE* criaDefault();
 void imprimeArquivo(FILE* arquivo);
 int* setarTamanhoVetor(FILE* arquivo);
-
+//int* createHeap(char* string);
 #endif
